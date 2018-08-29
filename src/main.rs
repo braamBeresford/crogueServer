@@ -1,10 +1,15 @@
+extern crate byteorder;
+
+use byteorder::{LittleEndian, WriteBytesExt};
+use std::mem;
 use std::net::UdpSocket;
 use std::net::{Ipv4Addr, SocketAddrV4};
 use std::io;
 
 pub struct Entity {
-    pub x: u8,
-    pub y: u8
+    pub x: i32,
+    pub y: i32,
+    pub id: i32
 }
 
 fn main() {
@@ -12,6 +17,7 @@ fn main() {
     
     while true{
         let res = snd();
+        break;
     }
 }
 
@@ -24,10 +30,23 @@ fn snd() -> Result<(), io::Error> {
 
     let connection2 = SocketAddrV4::new(ip, 9991);
 
-    let test = 69;
-    let buf = &[test, 0x02, 0x03];
-    try!(socket.send_to(buf, connection2));
-    println!("{:?}", buf);
+    let test: u32 = 2;
+    let bytes: [u8; 4] = unsafe {std::mem::transmute::<u32, [u8; 4]>(test.to_le())};
+    let buf = &bytes;
+
+        let i: i64 = 12345;
+    let mut bs = [0u8; mem::size_of::<i64>()];
+    bs.as_mut()
+        .write_i64::<LittleEndian>(i)
+        .expect("Unable to write");
+
+    try!(socket.send_to(&bs, connection2));
+    // println!("{:?}", buf);
+
+
+    // for x in &bs {
+    //     println!("{:X}", x);
+    // }
 
     Ok(()) 
 }
