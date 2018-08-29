@@ -1,30 +1,35 @@
 use std::net::UdpSocket;
 use std::net::{Ipv4Addr, SocketAddrV4};
 use std::io;
+
+pub struct Entity {
+    pub x: u8,
+    pub y: u8
+}
+
 fn main() {
+    let mut entities: Vec<Entity> = Vec::new();
     
-       while true{
-           let res = recv();
-           println!("{:?}", res);
-       }
-       
+    while true{
+        let res = snd();
+    }
 }
 
 
-fn recv() -> Result<(), io::Error> { // Define the local connection information 
+fn snd() -> Result<(), io::Error> {
     let ip = Ipv4Addr::new(127, 0, 0, 1); 
-    let connection = SocketAddrV4::new(ip, 9991);
+    let connection = SocketAddrV4::new(ip, 9992);
 
-    // Bind the socket
     let socket = try!(UdpSocket::bind(connection));
 
-    // Read from the socket
-    let mut buf = [0; 10];
-    let (amt, src) = try!(socket.recv_from(&mut buf));
+    let connection2 = SocketAddrV4::new(ip, 9991);
 
-    // Print only the valid data (slice)
-    println!("{:?}", &buf[0 .. amt]);
+    let test = 69;
+    let buf = &[test, 0x02, 0x03];
+    try!(socket.send_to(buf, connection2));
+    println!("{:?}", buf);
 
     Ok(()) 
 }
+
 
